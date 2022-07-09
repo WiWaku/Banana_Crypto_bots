@@ -1,11 +1,10 @@
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from config import bot
-from aiogram import types
 from aiogram.types import *
 
 dp = Dispatcher(bot)
-record = True
+record = True  # переменная для имитации получение инфы о наборе(идет или нет)
 
 
 @dp.message_handler(commands='start')
@@ -15,17 +14,18 @@ async def start_command(message: Message) -> None:
     :param message:
     :return: None
     """
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton(text="Начать!", callback_data="WELCOME"))
+
     await message.answer('Привет 👋. Это основной бот проекта Banana Crypto. '
                          'Здесь ты можешь узнать более подробно о проекте и его продуктах. '
-                         'Нажимай "Начать" и начнем общение.', reply_markup=keyboard)
+                         'Нажимай "Начать" и начнем общение.', reply_markup=
+                         InlineKeyboardMarkup(row_width=1).add(
+                             *[InlineKeyboardButton(text="Начать!", callback_data="WELCOME")]))
 
 
 @dp.callback_query_handler(text="WELCOME")
 async def welcome_func(query: CallbackQuery) -> None:
     """
-
+    Приветсвенная функция, показывающая основное меню.
     :param query:
     :return:
     """
@@ -147,23 +147,24 @@ async def website_func(query: CallbackQuery) -> None:
 @dp.callback_query_handler(text="MARKET")
 async def market_func(query: CallbackQuery) -> None:
     """
-
+    Функция для отправки информации о продуктах компании.
     :param query:
-    :return:
+    :return: None
+    Attributes:
+        keyboard(InlineKeyboardMarkup): клавиатура, которая меняется в зависимости от уровня пользователя
     """
+    # Проверка из бд уровня пользователя
     lvl = 2
     if lvl == 1:
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(InlineKeyboardMarkup(row_width=1).add(*[
-                                   InlineKeyboardButton(text="О комьюнити", callback_data="COMMUNITY"),
-                                   InlineKeyboardButton(text="О наставничестве", callback_data="MENTORING")
-                               ]))
+        keyboard = InlineKeyboardMarkup(row_width=1).add(*[
+            InlineKeyboardButton(text="О комьюнити", callback_data="COMMUNITY"),
+            InlineKeyboardButton(text="О наставничестве", callback_data="MENTORING")
+        ])
     else:
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(InlineKeyboardMarkup(row_width=1).add(*[
+        keyboard = InlineKeyboardMarkup(row_width=1).add(*[
             InlineKeyboardButton(text="Вступить в комьюнити", callback_data="JOIN_COMMUNITY"),
             InlineKeyboardButton(text="О наставничестве", callback_data="MENTORING")
-        ]))
+        ])
 
     await query.message.answer('Здесь ты можешь ознакомиться с основными продуктами нашего проекта. '
                                'Комьюнити - это доступ в наше закрытое сообщество профессионалов с '
@@ -177,9 +178,9 @@ async def market_func(query: CallbackQuery) -> None:
 @dp.callback_query_handler(text="JOIN_COMMUNITY")
 async def join_community_func(query: CallbackQuery) -> None:
     """
-
+    Функция для отправки информации о стоимости подписки.
     :param query:
-    :return:
+    :return: None
     """
     await query.message.answer('Доступные подписки:',
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(*[
@@ -219,7 +220,7 @@ async def test_func(query: CallbackQuery) -> None:
 @dp.callback_query_handler(text="TEST")
 async def test_func(query: CallbackQuery) -> None:
     """
-
+    Функция для передачи ссылки на бота с тестом для поднятия уровня
     :param query:
     :return:
     """
@@ -228,6 +229,11 @@ async def test_func(query: CallbackQuery) -> None:
 
 @dp.callback_query_handler(text="CONGRATULATIONS")
 async def congratulations_func(query: CallbackQuery):
+    """
+    Функция для оповещения пользователя, что его уровень был повышен
+    :param query:
+    :return:
+    """
     await query.message.answer('Отлично! Ты справился со вступительным тестом. '
                                'Хорошего криптана видно из далека. Доступ откроется через... 1... 2... 3...',
                                reply_markup=InlineKeyboardMarkup(row_width=1).add(*[
@@ -238,6 +244,11 @@ async def congratulations_func(query: CallbackQuery):
 
 @dp.callback_query_handler(text="LVL_UP")
 async def lvl_up_func(query: CallbackQuery):
+    """
+    Повышаем уровень пользователя, показываем пользователю новое меню.
+    :param query:
+    :return:
+    """
     # повышаем уровень пользователя в бд
     await query.message.answer('Ура! Теперь доступно полное меню. Ниже ты можешь ознакомиться с ',
                                reply_markup=InlineKeyboardMarkup(row_width=3).add(*[
@@ -252,6 +263,11 @@ async def lvl_up_func(query: CallbackQuery):
 
 @dp.callback_query_handler(text="SUBSCRIPTION")
 async def check_sub_func(query: CallbackQuery):
+    """
+    Функция для получения инфонмации о подписке пользователя.
+    :param query:
+    :return:
+    """
     await query.message.answer('Список подписок:\nПодписка: "название подписки в бд"\nСрок доступа: "schedule + бд"',
                                reply_markup=InlineKeyboardMarkup(row_width=3).add(*[
                                    InlineKeyboardButton(text="Главное меню", callback_data="DESCRIPTION"),
@@ -261,6 +277,11 @@ async def check_sub_func(query: CallbackQuery):
 
 @dp.callback_query_handler(text="REFERRAL")
 async def referral_func(query: CallbackQuery):
+    """
+
+    :param query:
+    :return:
+    """
     # инфа по рефералке
     pass
 
